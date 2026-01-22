@@ -1,0 +1,31 @@
+import { Dimensions } from 'react-native';
+
+const { width, height } = Dimensions.get('window');
+
+export const DIMENSIONS = {
+  SCREEN_WIDTH: width,
+  SCREEN_HEIGHT: height,
+  
+  PADDING_SMALL: 8,
+  PADDING_MEDIUM: 16,
+  PADDING_LARGE: 24,
+  
+  MARGIN_SMALL: 8,
+  MARGIN_MEDIUM: 16,
+  MARGIN_LARGE: 24,
+  
+  BORDER_RADIUS_SMALL: 4,
+  BORDER_RADIUS_MEDIUM: 8,
+  BORDER_RADIUS_LARGE: 12,
+  
+  FONT_SIZE_SMALL: 12,
+  FONT_SIZE_MEDIUM: 16,
+  FONT_SIZE_LARGE: 20,
+  FONT_SIZE_XLARGE: 24,
+  
+  BUTTON_HEIGHT: 48,
+  INPUT_HEIGHT: 40,
+  
+  HEADER_HEIGHT: 60,
+  TAB_BAR_HEIGHT: 60,
+};

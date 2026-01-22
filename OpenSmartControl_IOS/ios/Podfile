@@ -1,0 +1,95 @@
+platform :ios, '26.0'
+
+# Thêm dòng này:
+project 'MassageChairControl.xcodeproj'
+
+# Resolve react_native_pods.rb with node to allow for hoisting
+require Pod::Executable.execute_command('node', ['-p',
+  'require.resolve(
+    "react-native/scripts/react_native_pods.rb",
+    {paths: [process.argv[1]]},
+  )', __dir__]).strip
+
+prepare_react_native_project!
+
+linkage = ENV['USE_FRAMEWORKS']
+if linkage != nil
+  Pod::UI.puts "Configuring Pod with #{linkage}ally linked Frameworks".green
+  use_frameworks! :linkage => linkage.to_sym
+end
+
+target 'VPG_MS_Redux' do
+  config = use_native_modules!
+
+  use_react_native!(
+    :path => config[:reactNativePath],
+    :app_path => "#{Pod::Config.instance.installation_root}/..",
+    :hermes_enabled => true
+  )
+
+  post_install do |installer|
+    react_native_post_install(
+      installer,
+      config[:reactNativePath],
+      :mac_catalyst_enabled => false,
+    )
+    
+    # Suppress deprecation warnings from React Native core
+    installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |config|
+        config.build_settings['GCC_WARN_DEPRECATED_DECLARATIONS'] = 'NO'
+        config.build_settings['CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS'] = 'NO'
+        
+        # Suppress implicit conversion warnings (size_t to int, etc.)
+        config.build_settings['CLANG_WARN_IMPLICIT_INT_CONVERSION'] = 'NO'
+        config.build_settings['CLANG_WARN_IMPLICIT_CONVERSION'] = 'NO'
+        config.build_settings['GCC_WARN_64_TO_32_BIT_CONVERSION'] = 'NO'
+        
+        # Suppress Swift deprecation warnings (class keyword in protocols, etc.)
+        config.build_settings['SWIFT_SUPPRESS_WARNINGS'] = 'YES'
+        config.build_settings['SWIFT_WARN_ABOUT_DEPRECATED_CLASS_PROTOCOL'] = 'NO'
+        
+        # Suppress deprecation attribute warnings in headers
+        config.build_settings['CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS'] = 'NO'
+        config.build_settings['GCC_WARN_DEPRECATED_DECLARATIONS'] = 'NO'
+        config.build_settings['CLANG_WARN_DOCUMENTATION_COMMENTS'] = 'NO'
+        
+        # Suppress incompatible type warnings (for react-native-ble-plx and other pods)
+        config.build_settings['CLANG_WARN_INCOMPATIBLE_POINTER_TYPES'] = 'NO'
+        config.build_settings['CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF'] = 'NO'
+        config.build_settings['GCC_WARN_INHIBIT_ALL_WARNINGS'] = 'NO'
+        
+        # Suppress linker warnings about duplicate libraries
+        config.build_settings['OTHER_LDFLAGS'] ||= ['$(inherited)']
+        # Remove duplicate -lc++ flags if present
+        if config.build_settings['OTHER_LDFLAGS'].is_a?(Array)
+          config.build_settings['OTHER_LDFLAGS'] = config.build_settings['OTHER_LDFLAGS'].uniq
+        end
+        
+        # Disable New Architecture for slider to fix build error
+        if target.name == 'react-native-slider'
+          config.build_settings['RCT_NEW_ARCH_ENABLED'] = 'NO'
+        end
+        
+        # Fix module map issues - ensure proper module map generation
+        config.build_settings['DEFINES_MODULE'] = 'YES'
+        config.build_settings['CLANG_ENABLE_MODULES'] = 'YES'
+        
+        # Ensure dSYM generation for frameworks (especially hermes)
+        # For Release builds, use dwarf-with-dsym to include dSYM in archive
+        if config.name == 'Release'
+          config.build_settings['DEBUG_INFORMATION_FORMAT'] = 'dwarf-with-dsym'
+        else
+          config.build_settings['DEBUG_INFORMATION_FORMAT'] = 'dwarf'
+        end
+        
+        # Ensure dSYM is copied to archive for hermes framework
+        if target.name == 'hermes-engine'
+          config.build_settings['STRIP_INSTALLED_PRODUCT'] = 'NO'
+          config.build_settings['COPY_PHASE_STRIP'] = 'NO'
+          config.build_settings['STRIP_STYLE'] = 'non-global'
+        end
+      end
+    end
+  end
+end

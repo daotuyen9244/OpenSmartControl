@@ -1,0 +1,57 @@
+{
+  "name": "massage-chair-control",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "android": "react-native run-android",
+    "ios": "react-native run-ios",
+    "lint": "eslint .",
+    "start": "react-native start",
+    "test": "jest",
+    "clean": "npx react-native start --reset-cache",
+    "build:android": "cd android && ./gradlew assembleRelease",
+    "build:android:clean": "cd android && ./gradlew clean && ./gradlew assembleRelease",
+    "build:ios:bundle": "react-native bundle --platform ios --dev false --entry-file index.js --bundle-output ios/main.jsbundle --assets-dest ios/"
+  },
+  "dependencies": {
+    "@react-native-async-storage/async-storage": "^2.2.0",
+    "@react-native-community/slider": "^4.5.7",
+    "@react-native/new-app-screen": "0.80.0",
+    "@reduxjs/toolkit": "^2.8.2",
+    "buffer": "^6.0.3",
+    "react": "19.1.0",
+    "react-native": "0.80.0",
+    "react-native-ble-plx": "^3.5.0",
+    "react-native-device-info": "^14.1.1",
+    "react-native-permissions": "^5.4.1",
+    "react-native-vector-icons": "^10.2.0",
+    "react-native-vision-camera": "^4.7.0",
+    "react-redux": "^9.2.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.25.2",
+    "@babel/preset-env": "^7.25.3",
+    "@babel/runtime": "^7.25.0",
+    "@react-native-community/cli": "^20.0.2",
+    "@react-native-community/cli-platform-android": "latest",
+    "@react-native-community/cli-platform-ios": "latest",
+    "@react-native/babel-preset": "^0.80.0",
+    "@react-native/eslint-config": "0.80.0",
+    "@react-native/metro-config": "^0.80.0",
+    "@react-native/typescript-config": "0.80.0",
+    "@types/jest": "^29.5.13",
+    "@types/react": "^19.1.0",
+    "@types/react-test-renderer": "^19.1.0",
+    "babel-plugin-module-resolver": "^5.0.2",
+    "eslint": "^8.19.0",
+    "jest": "^29.6.3",
+    "metro-react-native-babel-preset": "^0.77.0",
+    "prettier": "2.8.8",
+    "react-native-codegen": "^0.70.7",
+    "react-test-renderer": "19.1.0",
+    "typescript": "5.0.4"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

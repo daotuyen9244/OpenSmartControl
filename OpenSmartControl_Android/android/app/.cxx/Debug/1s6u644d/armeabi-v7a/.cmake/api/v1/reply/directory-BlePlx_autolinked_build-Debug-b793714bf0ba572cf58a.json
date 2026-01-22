@@ -1,0 +1,14 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : [],
+		"files" : [],
+		"nodes" : []
+	},
+	"installers" : [],
+	"paths" : 
+	{
+		"build" : "BlePlx_autolinked_build",
+		"source" : "/Users/admin/Desktop/vpg-work/VPG_MS_Release/MSMobileApp_Android/node_modules/react-native-ble-plx/android/build/generated/source/codegen/jni"
+	}
+}
