@@ -1,0 +1,6 @@
+D:\OpenSmartControl\OpenSmartControl_Android\node_modules\@react-native-async-storage\async-storage\android\build\generated\source\codegen\jni\CMakeLists.txt
+D:\OpenSmartControl\OpenSmartControl_Android\node_modules\@react-native-community\slider\android\src\main\jni\CMakeLists.txt
+D:\OpenSmartControl\OpenSmartControl_Android\node_modules\react-native-ble-plx\android\build\generated\source\codegen\jni\CMakeLists.txt
+D:\OpenSmartControl\OpenSmartControl_Android\node_modules\react-native-permissions\android\build\generated\source\codegen\jni\CMakeLists.txt
+D:\OpenSmartControl\OpenSmartControl_Android\node_modules\react-native-vector-icons\android\build\generated\source\codegen\jni\CMakeLists.txt
+D:\OpenSmartControl\OpenSmartControl_Android\node_modules\react-native\ReactAndroid\cmake-utils\default-app-setup\CMakeLists.txt

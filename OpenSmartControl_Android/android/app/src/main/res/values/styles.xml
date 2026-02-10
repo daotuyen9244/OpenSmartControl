@@ -4,6 +4,7 @@
     <style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="android:editTextBackground">@drawable/rn_edit_text_material</item>
+        <!-- Không dùng statusBarColor/navigationBarColor (API cũ, deprecated trên Android 15). Màu thanh hệ thống do enableEdgeToEdge() xử lý. -->
     </style>
 
 </resources>

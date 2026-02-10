@@ -55,9 +55,9 @@ react {
 }
 
 /**
- * Set this to true to Run Proguard on Release builds to minify the Java bytecode.
+ * Bật R8/ProGuard cho bản release: thu nhỏ app, làm rối mã, tạo file mapping để tải lên Play Console (ghi chú phát hành / phân tích lỗi).
  */
-def enableProguardInReleaseBuilds = false
+def enableProguardInReleaseBuilds = true
 
 /**
  * The preferred build flavor of JavaScriptCore (JSC)
@@ -82,8 +82,8 @@ android {
         applicationId "com.vpg_ms_redux"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 2
-        versionName "1.0.1"
+        versionCode 6
+        versionName "1.0.5"
     }
     signingConfigs {
         debug {
@@ -106,8 +106,8 @@ android {
             signingConfig signingConfigs.debug
         }
         release {
-            shrinkResources false
-            minifyEnabled false
+            shrinkResources enableProguardInReleaseBuilds
+            minifyEnabled enableProguardInReleaseBuilds
             signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }

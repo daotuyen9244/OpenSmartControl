@@ -1,0 +1,121 @@
+diff --git a/node_modules/react-native/ReactAndroid/src/main/java/com/facebook/react/modules/statusbar/StatusBarModule.kt b/node_modules/react-native/ReactAndroid/src/main/java/com/facebook/react/modules/statusbar/StatusBarModule.kt
+index 07bba9d..7f17ed7 100644
+--- a/node_modules/react-native/ReactAndroid/src/main/java/com/facebook/react/modules/statusbar/StatusBarModule.kt
++++ b/node_modules/react-native/ReactAndroid/src/main/java/com/facebook/react/modules/statusbar/StatusBarModule.kt
+@@ -32,12 +32,14 @@ import com.facebook.react.views.view.setStatusBarVisibility
+ internal class StatusBarModule(reactContext: ReactApplicationContext?) :
+     NativeStatusBarManagerAndroidSpec(reactContext) {
+ 
+-  @Suppress("DEPRECATION")
+   override fun getTypedExportedConstants(): Map<String, Any> {
++    // Android 15+: không dùng Window.getStatusBarColor (deprecated). Trả về transparent cho edge-to-edge.
+     val statusBarColor =
+-        reactApplicationContext.getCurrentActivity()?.window?.statusBarColor?.let { color ->
+-          String.format("#%06X", 0xFFFFFF and color)
+-        } ?: "black"
++        if (android.os.Build.VERSION.SDK_INT >= 35) "#00000000"
++        else
++            reactApplicationContext.getCurrentActivity()?.window?.statusBarColor?.let { color ->
++              String.format("#%06X", 0xFFFFFF and color)
++            } ?: "black"
+     return mapOf(
+         HEIGHT_KEY to PixelUtil.toDIPFromPixel(getStatusBarHeightPx()),
+         DEFAULT_BACKGROUND_COLOR_KEY to statusBarColor,
+@@ -60,8 +62,11 @@ internal class StatusBarModule(reactContext: ReactApplicationContext?) :
+         .toFloat()
+   }
+ 
+-  @Suppress("DEPRECATION")
+   override fun setColor(colorDouble: Double, animated: Boolean) {
++    if (android.os.Build.VERSION.SDK_INT >= 35) {
++      // Android 15+: setStatusBarColor/setNavigationBarColor deprecated; edge-to-edge dùng transparent, bỏ qua.
++      return
++    }
+     val color = colorDouble.toInt()
+     val activity = reactApplicationContext.getCurrentActivity()
+     if (activity == null) {
+diff --git a/node_modules/react-native/ReactAndroid/src/main/java/com/facebook/react/views/view/WindowUtil.kt b/node_modules/react-native/ReactAndroid/src/main/java/com/facebook/react/views/view/WindowUtil.kt
+index 8b0aff2..f09a504 100644
+--- a/node_modules/react-native/ReactAndroid/src/main/java/com/facebook/react/views/view/WindowUtil.kt
++++ b/node_modules/react-native/ReactAndroid/src/main/java/com/facebook/react/views/view/WindowUtil.kt
+@@ -43,30 +43,33 @@ internal fun Window.setStatusBarVisibility(isHidden: Boolean) {
+   }
+ }
+ 
+-@Suppress("DEPRECATION")
+ private fun Window.statusBarHide() {
+   if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+-    // Ensure the content extends into the cutout area
+-    attributes.layoutInDisplayCutoutMode =
+-        WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+     setDecorFitsSystemWindows(false)
++    // Android 15 (API 35): chỉ dùng ALWAYS, không dùng SHORT_EDGES/DEFAULT (deprecated)
++    attributes.layoutInDisplayCutoutMode =
++        if (Build.VERSION.SDK_INT >= 35)
++          WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS
++        else
++          WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+   }
+   addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+   clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN)
+ }
+ 
+-@Suppress("DEPRECATION")
+ private fun Window.statusBarShow() {
+   if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+-    attributes.layoutInDisplayCutoutMode =
+-        WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_DEFAULT
+     setDecorFitsSystemWindows(true)
++    attributes.layoutInDisplayCutoutMode =
++        if (Build.VERSION.SDK_INT >= 35)
++          WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS
++        else
++          WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_DEFAULT
+   }
+   addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN)
+   clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+ }
+ 
+-@Suppress("DEPRECATION")
+ internal fun Window.setSystemBarsTranslucency(isTranslucent: Boolean) {
+   WindowCompat.setDecorFitsSystemWindows(this, !isTranslucent)
+ 
+@@ -80,14 +83,17 @@ internal fun Window.setSystemBarsTranslucency(isTranslucent: Boolean) {
+       isNavigationBarContrastEnforced = true
+     }
+ 
+-    statusBarColor = Color.TRANSPARENT
+-    navigationBarColor =
+-        when {
+-          Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> Color.TRANSPARENT
+-          Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1 && !isDarkMode ->
+-              Color.argb(0xe6, 0xFF, 0xFF, 0xFF)
+-          else -> Color.argb(0x80, 0x1b, 0x1b, 0x1b)
+-        }
++    // Android 15 (API 35): setStatusBarColor/setNavigationBarColor deprecated; dùng enableEdgeToEdge() thay thế
++    if (Build.VERSION.SDK_INT < 35) {
++      statusBarColor = Color.TRANSPARENT
++      navigationBarColor =
++          when {
++            Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> Color.TRANSPARENT
++            Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1 && !isDarkMode ->
++                Color.argb(0xe6, 0xFF, 0xFF, 0xFF)
++            else -> Color.argb(0x80, 0x1b, 0x1b, 0x1b)
++          }
++    }
+ 
+     WindowInsetsControllerCompat(this, this.decorView).run {
+       isAppearanceLightNavigationBars = !isDarkMode
+@@ -95,11 +101,7 @@ internal fun Window.setSystemBarsTranslucency(isTranslucent: Boolean) {
+ 
+     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+       attributes.layoutInDisplayCutoutMode =
+-          when {
+-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.R ->
+-                WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS
+-            else -> WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+-          }
++          WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS
+     }
+   }
+ }

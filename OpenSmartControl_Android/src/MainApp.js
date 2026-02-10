@@ -11,7 +11,7 @@
  */
 
 import React, { useEffect } from 'react';
-import { View, StyleSheet, StatusBar, BackHandler, Alert } from 'react-native';
+import { View, StyleSheet, StatusBar, BackHandler, Alert, Platform } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { navigateTo } from './store/navigationSlice';
 import NavigationBar from './components/NavigationBar';
@@ -155,10 +155,10 @@ const MainApp = () => {
    */
   return (
     <View style={styles.container}>
-      {/* Status bar configuration */}
-      <StatusBar 
-        barStyle="dark-content" 
-        backgroundColor={COLORS.WHITE} 
+      {/* Status bar: Android dùng trong suốt cho tràn viền (edge-to-edge), iOS giữ nền trắng */}
+      <StatusBar
+        barStyle="dark-content"
+        backgroundColor={Platform.OS === 'android' ? 'transparent' : COLORS.WHITE}
       />
       
       {/* Render current screen */}

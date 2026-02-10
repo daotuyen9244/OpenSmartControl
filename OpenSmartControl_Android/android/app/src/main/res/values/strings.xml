@@ -1,3 +1,4 @@
 <resources>
+    <!-- Tên hiển thị app - đồng bộ với iOS (CFBundleDisplayName trong Info.plist) -->
     <string name="app_name">Massage Chair Control</string>
 </resources>

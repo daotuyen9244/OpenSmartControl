@@ -80,7 +80,7 @@ const HomeScreen = () => {
         <View style={styles.header}>
         {/* Logo */}
         <Image 
-          source={require('../../icon.png')} 
+          source={require('../assets/icon.png')} 
           style={styles.logo}
           resizeMode="contain"
         />
